@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Ball</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid black;
+            display: block;
+            margin: 20px auto;
+        }
+        #score {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Catch the Ball!</h1>
+    <p id="score">Score: 0</p>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        let score = 0;
+        let ball = { x: 50, y: 50, radius: 20, dx: 2, dy: 2 };
+        
+        function drawBall() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = "red";
+            ctx.fill();
+            ctx.closePath();
+        }
+        
+        function updateBall() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+                ball.dx *= -1;
+            }
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.dy *= -1;
+            }
+        }
+        
+        function gameLoop() {
+            updateBall();
+            drawBall();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        canvas.addEventListener("click", function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            const distance = Math.sqrt((clickX - ball.x) ** 2 + (clickY - ball.y) ** 2);
+            
+            if (distance < ball.radius) {
+                score++;
+                document.getElementById("score").textContent = "Score: " + score;
+                ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
+                ball.y = Math.random() * (canvas.height - ball.radius * 2) + ball.radius;
+            }
+        });
+        
+        gameLoop();
+    </script>
+</body>
+</html>
